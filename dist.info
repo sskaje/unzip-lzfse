@@ -1,0 +1,10 @@
+--- This file is part of LuaDist project
+
+name = "unzip"
+version = "6.0"
+
+desc = "Info-ZIP unzip utility"
+author = "Mark Adler, John Bush, Karl Davis, Harald Denker, Jean-Michel Dubois, Jean-loup Gailly, Hunter Goatley, Ed Gordon, Ian Gorman, Chris Herborth, Dirk Haase, Greg Hartwig, Robert Heath, Jonathan Hudson, Paul Kienitz, David Kirschbaum, Johnny Lee, Onno van der Linden, Igor Mandrichenko, Steve P. Miller, Sergio Monesi, Keith Owens, George Petrov, Greg Roelofs, Kai Uwe Rommel, Steve Salisbury, Dave Smith, Steven M. Schweda, Christian Spieler, Cosmin Truta, Antoine Verheijen, Paul von Behren, Rich Wales, Mike White"
+license = "BSD"
+url = "http://www.info-zip.org/Zip.html"
+maintainer = "Peter Drahoš"
