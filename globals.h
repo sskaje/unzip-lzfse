@@ -146,6 +146,10 @@
 #  include "bzlib.h"
 #endif
 
+#ifdef USE_LZFSE
+#  include "lzfse.h"
+#endif
+
 
 /*************/
 /*  Globals  */

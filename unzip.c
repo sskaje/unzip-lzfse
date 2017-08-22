@@ -521,6 +521,10 @@ static ZCONST char Far ZipInfoUsageLine3[] = "miscellaneous options:\n\
      static ZCONST char Far UseBZip2[] =
      "USE_BZIP2 (PKZIP 4.6+, using bzip2 lib version %s)";
 #  endif
+#  ifdef USE_LZFSE
+static ZCONST char Far Use_Lzfse[] =
+        "USE_LZFSE";
+#  endif
 #  ifdef VMS_TEXT_CONV
      static ZCONST char Far VmsTextConv[] = "VMS_TEXT_CONV";
 #  endif
@@ -2555,6 +2559,11 @@ static void show_version_info(__G)
           BZ2_bzlibVersion());
         Info(slide, 0, ((char *)slide, LoadFarString(CompileOptFormat),
           (char *)(slide+256)));
+        ++numopts;
+#endif
+#ifdef USE_LZFSE
+        Info(slide, 0, ((char *)slide, LoadFarString(CompileOptFormat),
+                LoadFarStringSmall(Use_Lzfse)));
         ++numopts;
 #endif
 #ifdef VMS_TEXT_CONV

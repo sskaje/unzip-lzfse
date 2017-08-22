@@ -667,7 +667,7 @@ int readbyte(__G)   /* refill inbuf and return a byte if available, else EOF */
 
 
 
-#if defined(USE_ZLIB) || defined(USE_BZIP2)
+#if defined(USE_ZLIB) || defined(USE_BZIP2) || defined(USE_LZFSE)
 
 /************************/
 /* Function fillinbuf() */
@@ -697,7 +697,7 @@ int fillinbuf(__G) /* like readbyte() except returns number of bytes in inbuf */
 
 } /* end function fillinbuf() */
 
-#endif /* USE_ZLIB || USE_BZIP2 */
+#endif /* USE_ZLIB || USE_BZIP2 || USE_LZFSE */
 
 
 

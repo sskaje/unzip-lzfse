@@ -645,6 +645,33 @@ else
 fi
 
 
+# lzfse
+
+echo "Check lzfse support"
+D_USE_LZFSE=""
+L_LZFSE=""
+CFLAGS_LZFSE=""
+
+if test -n "${LZFSE_PATH}" ; then
+  echo "  Check for lzfse compiled library in IZ_LZFSE (${IZ_LZFSE})"
+  if test -f "${LZFSE_PATH}/lib/liblzfse.a" -o -f "${LZFSE_PATH}/lib/liblzfse.dylib"; then
+    if test -f "${LZFSE_PATH}/include/lzfse.h"; then
+      CFLAGSR="${CFLAGSR} -DUSE_LZFSE -I${LZFSE_PATH}/include"
+      LFLAGS1="${LFLAGS1} -L${LZFSE_PATH}/lib -llzfse"
+      echo "-- Found lzfse library - linking in lzfse"
+    else
+      echo "    ${LZFSE_PATH}/include/lzfse.h not found"
+      echo "-- NO lzfse support !"
+    fi
+  else
+    echo "    ${LZFSE_PATH}/lib/liblzfse.\{a,dylib\} not found"
+    echo "-- NO lzfse support !"
+  fi
+else
+  echo "-- lzfse not found - no lzfse support"
+fi
+
+
 echo CC=\"${CC}\" CF=\"${CFLAGSR} ${D_USE_BZ2}\" CRCA_O=\"${CRC32OA}\" \
        AS=\"${CC} -c\" LFLAGS1=\"${LFLAGS1}\" LF2=\"${LFLAGS2}\" \
        CC_BZ=\"${CC_BZ}\" CFLAGS_BZ=\"${CFLAGS_BZ}\" \

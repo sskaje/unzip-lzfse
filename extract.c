@@ -28,6 +28,7 @@
              fnfilter()
              dircomp()                (SET_DIR_ATTRIB only)
              UZbunzip2()              (USE_BZIP2 only)
+             UZlzfse_decode()         (USE_LZFSE only)
 
   ---------------------------------------------------------------------------*/
 
@@ -141,15 +142,18 @@ static ZCONST char Far ComprMsgNum[] =
    static ZCONST char Far CmprIBMLZ77[]    = "IBM LZ77";
    static ZCONST char Far CmprWavPack[]    = "WavPack";
    static ZCONST char Far CmprPPMd[]       = "PPMd";
+   static ZCONST char Far CmprLZFSE[]      = "LZFSE";
    static ZCONST char Far *ComprNames[NUM_METHODS] = {
      CmprNone, CmprShrink, CmprReduce, CmprReduce, CmprReduce, CmprReduce,
      CmprImplode, CmprTokenize, CmprDeflate, CmprDeflat64, CmprDCLImplode,
-     CmprBzip, CmprLZMA, CmprIBMTerse, CmprIBMLZ77, CmprWavPack, CmprPPMd
+     CmprBzip, CmprLZMA, CmprIBMTerse, CmprIBMLZ77, CmprWavPack, CmprPPMd,
+     CmprLZFSE
    };
    static ZCONST unsigned ComprIDs[NUM_METHODS] = {
      STORED, SHRUNK, REDUCED1, REDUCED2, REDUCED3, REDUCED4,
      IMPLODED, TOKENIZED, DEFLATED, ENHDEFLATED, DCLIMPLODED,
-     BZIPPED, LZMAED, IBMTERSED, IBMLZ77ED, WAVPACKED, PPMDED
+     BZIPPED, LZMAED, IBMTERSED, IBMLZ77ED, WAVPACKED, PPMDED,
+     LZFSED
    };
 #endif /* !SFX */
 static ZCONST char Far FilNamMsg[] =
@@ -272,6 +276,9 @@ static ZCONST char Far InvalidComprData[] = "invalid compressed data to ";
 static ZCONST char Far Inflate[] = "inflate";
 #ifdef USE_BZIP2
   static ZCONST char Far BUnzip[] = "bunzip";
+#endif
+#ifdef USE_LZFSE
+static ZCONST char Far Lzfse[] = "lzfse";
 #endif
 
 #ifndef SFX
@@ -844,16 +851,23 @@ static int store_info(__G)   /* return 0 if skipping, 1 if OK */
 #  define UNKN_PPMD TRUE      /* PPMd unknown */
 #endif
 
+
+#ifdef USE_LZFSE
+#  define UNKN_LZFSE (G.crec.compression_method!=LZFSED)
+#else
+#  define UNKN_LZFSE TRUE      /* LZFSE unknown */
+#endif
+
 #ifdef SFX
 #  ifdef USE_DEFLATE64
 #    define UNKN_COMPR \
      (G.crec.compression_method!=STORED && G.crec.compression_method<DEFLATED \
       && G.crec.compression_method>ENHDEFLATED \
-      && UNKN_BZ2 && UNKN_LZMA && UNKN_WAVP && UNKN_PPMD)
+      && UNKN_BZ2 && UNKN_LZMA && UNKN_WAVP && UNKN_PPMD && UNKN_LZFSE)
 #  else
 #    define UNKN_COMPR \
      (G.crec.compression_method!=STORED && G.crec.compression_method!=DEFLATED\
-      && UNKN_BZ2 && UNKN_LZMA && UNKN_WAVP && UNKN_PPMD)
+      && UNKN_BZ2 && UNKN_LZMA && UNKN_WAVP && UNKN_PPMD && UNKN_LZFSE)
 #  endif
 #else
 #  ifdef COPYRIGHT_CLEAN  /* no reduced files */
@@ -871,12 +885,12 @@ static int store_info(__G)   /* return 0 if skipping, 1 if OK */
 #    define UNKN_COMPR (UNKN_RED || UNKN_SHR || \
      G.crec.compression_method==TOKENIZED || \
      (G.crec.compression_method>ENHDEFLATED && UNKN_BZ2 && UNKN_LZMA \
-      && UNKN_WAVP && UNKN_PPMD))
+      && UNKN_WAVP && UNKN_PPMD && UNKN_LZFSE))
 #  else
 #    define UNKN_COMPR (UNKN_RED || UNKN_SHR || \
      G.crec.compression_method==TOKENIZED || \
      (G.crec.compression_method>DEFLATED && UNKN_BZ2 && UNKN_LZMA \
-      && UNKN_WAVP && UNKN_PPMD))
+      && UNKN_WAVP && UNKN_PPMD && UNKN_LZFSE))
 #  endif
 #endif
 
@@ -1907,6 +1921,39 @@ static int extract_or_test_member(__G)    /* return PK-type error code */
             break;
 #endif /* USE_BZIP2 */
 
+
+#ifdef USE_LZFSE
+        case LZFSED:
+            if (!uO.tflag && QCOND2) {
+                Info(slide, 0, ((char *)slide, LoadFarString(ExtractMsg),
+                        "lzfse", FnFilter1(G.filename),
+                        (uO.aflag != 1 /* && G.pInfo->textfile==G.pInfo->textmode */)?
+                        "" : (G.pInfo->textfile? txt : bin), uO.cflag? NEWLINE : ""));
+            }
+            if ((r = UZlzfse_decode(__G)) != 0) {
+                if (r < PK_DISK) {
+                    if ((uO.tflag && uO.qflag) || (!uO.tflag && !QCOND2))
+                        Info(slide, 0x401, ((char *)slide,
+                            LoadFarStringSmall(ErrUnzipFile ), r == 3?
+                              LoadFarString(NotEnoughMem) :
+                              LoadFarString(InvalidComprData),
+                            LoadFarStringSmall2(Lzfse),
+                            FnFilter1(G.filename)));
+                    else
+                        Info(slide, 0x401, ((char *)slide,
+                                LoadFarStringSmall(ErrUnzipNoFile), r == 3?
+                                                                    LoadFarString(NotEnoughMem) :
+                                                                    LoadFarString(InvalidComprData),
+                                LoadFarStringSmall2(Lzfse)));
+                    error = ((r == 3) ? PK_MEM3 : PK_ERR);
+                } else {
+                    error = r;
+                }
+            }
+            break;
+#endif /* USE_LZFSE */
+
+
         default:   /* should never get to this point */
             Info(slide, 0x401, ((char *)slide,
               LoadFarString(FileUnknownCompMethod), FnFilter1(G.filename)));
@@ -2818,3 +2865,66 @@ uzbunzip_cleanup_exit:
     return retval;
 } /* end function UZbunzip2() */
 #endif /* USE_BZIP2 */
+
+
+/**************************/
+/*  Function UZlzfse_decode()  */
+/**************************/
+
+#ifdef USE_LZFSE
+
+static inline void *lzfse_reallocf(void *x, size_t s) {
+  void *y = realloc(x, s);
+  if (y == 0) {
+    free(x);
+    return 0;
+  }
+  return y;
+}
+
+int UZlzfse_decode(__G)
+__GDEF
+/* decompress a lzfsed entry using the lzfse routines */
+{
+    Trace((stderr, "LZFSE in\n"));
+    int retval = 0;
+
+#if (defined(DLL) && !defined(NO_SLIDE_REDIR))
+    if (G.redirect_slide)
+        wsize = G.redirect_size, redirSlide = G.redirect_buffer;
+    else
+        wsize = WSIZE, redirSlide = slide;
+#endif
+
+    size_t out_allocated = G.lrec.ucsize;
+    uint8_t *out = (uint8_t *)malloc(out_allocated);
+
+    size_t in_allocated = G.lrec.csize;
+    uint8_t *in  = (uint8_t *)malloc(in_allocated);
+
+    size_t offset = 0;
+
+    do {
+        memcpy((uint8_t *)in + offset, (uint8_t*)G.inptr, G.incnt);
+        offset += G.incnt;
+
+        if (G.csize > 0) {
+            // copy to in
+            size_t filled_size = fillinbuf(__G);
+            if (filled_size == 0) {
+                // error
+            }
+        } else {
+            break;
+        }
+    } while (1);
+
+    size_t out_size = lzfse_decode_buffer(out, G.lrec.ucsize, in, in_allocated, NULL);
+
+    flush(__G__ out, G.lrec.ucsize, 0);
+    free(out);
+    free(in);
+
+    return retval;
+}
+#endif /* USE_LZFSE */

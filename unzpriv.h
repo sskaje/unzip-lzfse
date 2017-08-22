@@ -1704,7 +1704,8 @@
 #define IBMLZ77ED        19
 #define WAVPACKED        97
 #define PPMDED           98
-#define NUM_METHODS      17     /* number of known method IDs */
+#define LZFSED           99
+#define NUM_METHODS      18     /* number of known method IDs */
 /* don't forget to update list.c (list_files()), extract.c and zipinfo.c
  * appropriately if NUM_METHODS changes */
 
@@ -2425,6 +2426,9 @@ int    huft_build                OF((__GPRO__ ZCONST unsigned *b, unsigned n,
 #ifdef USE_BZIP2
    int    UZbunzip2              OF((__GPRO));                  /* extract.c */
    void   bz_internal_error      OF((int bzerrcode));           /* ubz2err.c */
+#endif
+#ifdef USE_LZFSE
+   int    UZlzfse_decode         OF((__GPRO));                  /* extract.c */
 #endif
 
 /*---------------------------------------------------------------------------
