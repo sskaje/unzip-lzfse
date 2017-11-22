@@ -35,5 +35,22 @@ unzip -h
 
 e.g.
 ```
-$ ./unzip -d test ../pre-thinned12345678.thinned.signed.dpkg.ipa
+#unzip with lzfs
+$ ./unzip -d dst pre-thinned2490830240475770608.thinned.signed.dpkg.ipa 
+Archive:  pre-thinned2490830240475770608.thinned.signed.dpkg.ipa
+   creating: dst/META-INF/
+  unlzfsing: dst/META-INF/com.apple.ZipMetadata.plist  
+ extracting: dst/META-INF/com.apple.FixedZipMetadata.bin  
+   creating: dst/Payload/
+
+#unzip
+$ unzip -d dst pre-thinned2490830240475770608.thinned.signed.dpkg.ipa 
+Archive:  pre-thinned2490830240475770608.thinned.signed.dpkg.ipa
+   skipping: META-INF/com.apple.ZipMetadata.plist  unsupported compression method 99
+   ...
+   creating: dst/META-INF/
+ extracting: dst/META-INF/com.apple.FixedZipMetadata.bin  
+   creating: dst/Payload/
+
 ```
+
