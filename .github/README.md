@@ -15,13 +15,18 @@ $ make
 $ sudo make install
 ```
 
+If you're on Linux, try 
+``` cmake . ```
+before make
+
+
 
 ### Build unzip-lzfse
 
 ```
 $ git clone https://github.com/sskaje/unzip-lzfse
-$ git checkout lzfse
 $ cd unzip-lzfse
+$ git checkout lzfse
 $ export LZFSE_PATH=/usr/local
 $ make -f unix/Makefile all
 ```
