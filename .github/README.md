@@ -15,11 +15,6 @@ $ make
 $ sudo make install
 ```
 
-If you're on Linux, try 
-``` cmake . ```
-before make
-
-
 
 ### Build unzip-lzfse
 

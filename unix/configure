@@ -654,17 +654,23 @@ CFLAGS_LZFSE=""
 
 if test -n "${LZFSE_PATH}" ; then
   echo "  Check for lzfse compiled library in IZ_LZFSE (${IZ_LZFSE})"
-  if test -f "${LZFSE_PATH}/lib/liblzfse.a" -o -f "${LZFSE_PATH}/lib/liblzfse.dylib"; then
+  if test -f "${LZFSE_PATH}/lib/liblzfse.a" -o -f "${LZFSE_PATH}/lib/liblzfse.dylib" -o -f "${LZFSE_PATH}/lib/liblzfse.so"; then
     if test -f "${LZFSE_PATH}/include/lzfse.h"; then
       CFLAGSR="${CFLAGSR} -DUSE_LZFSE -I${LZFSE_PATH}/include"
-      LFLAGS1="${LFLAGS1} -L${LZFSE_PATH}/lib -llzfse"
+      LFLAGS1="${LFLAGS1} -L${LZFSE_PATH}/lib"
+      # force statically linked
+      if test ` uname -s 2> /dev/null ` = 'Darwin'; then
+        LFLAGS2="${LFLAGS2} -llzfse"
+      else
+        LFLAGS2="${LFLAGS2} -llzfse -static"
+      fi
       echo "-- Found lzfse library - linking in lzfse"
     else
       echo "    ${LZFSE_PATH}/include/lzfse.h not found"
       echo "-- NO lzfse support !"
     fi
   else
-    echo "    ${LZFSE_PATH}/lib/liblzfse.\{a,dylib\} not found"
+    echo "    ${LZFSE_PATH}/lib/liblzfse.\{a,so,dylib\} not found"
     echo "-- NO lzfse support !"
   fi
 else
