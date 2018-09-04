@@ -1926,7 +1926,7 @@ static int extract_or_test_member(__G)    /* return PK-type error code */
         case LZFSED:
             if (!uO.tflag && QCOND2) {
                 Info(slide, 0, ((char *)slide, LoadFarString(ExtractMsg),
-                        "unlzfs", FnFilter1(G.filename),
+                        "unlzfse", FnFilter1(G.filename),
                         (uO.aflag != 1 /* && G.pInfo->textfile==G.pInfo->textmode */)?
                         "" : (G.pInfo->textfile? txt : bin), uO.cflag? NEWLINE : ""));
             }
