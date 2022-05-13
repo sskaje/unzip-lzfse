@@ -2,7 +2,7 @@
 
 This project is modified based on unzip-6.0
 
-Read more: https://sskaje.me/2017/08/unzip-with-lzfse-support/
+Read more: [unzip with lzfse support](https://web.archive.org/web/20191128232315/https://sskaje.me/2017/08/unzip-with-lzfse-support/)
 
 ## Build
 
